@@ -1,0 +1,53 @@
+# Build environment for the tide-times Android APKs (Expo SDK 57 / React Native 0.86).
+#
+# - JDK 17 (AGP 8.12 requirement, also satisfies the gradle-daemon-jvm toolchain
+#   pinned by plugins/withAndroidBuildSetup.js)
+# - Node.js 22.13+ (Expo SDK 57 minimum)
+# - Android SDK: platform 36, build-tools 36.0.0, NDK 27.1.12297006 and CMake
+#   3.22.1 (react-native-reanimated and react-native-worklets compile native
+#   code with CMake from source during the Gradle build)
+#
+# No project source is COPY'd in; the build script bind-mounts the repo.
+
+FROM eclipse-temurin:17-jdk-jammy
+
+ARG NODE_VERSION=22.13.1
+ARG ANDROID_CMD_LINE_TOOLS=11076708
+ARG ANDROID_PLATFORM=android-36
+ARG ANDROID_BUILD_TOOLS=36.0.0
+ARG ANDROID_NDK=27.1.12297006
+ARG ANDROID_CMAKE=3.22.1
+
+ENV ANDROID_HOME=/opt/android-sdk \
+    ANDROID_SDK_ROOT=/opt/android-sdk \
+    ANDROID_USER_HOME=/opt/android-home \
+    GRADLE_USER_HOME=/opt/gradle-cache \
+    npm_config_cache=/opt/npm-cache \
+    EXPO_ENABLE_TELEMETRY=0 \
+    PATH=/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools:$PATH
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates curl unzip git \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSLo /tmp/node.tar.gz \
+        "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz" \
+    && tar -xzf /tmp/node.tar.gz -C /usr/local --strip-components=1 \
+    && rm /tmp/node.tar.gz \
+    && node --version \
+    && npm --version
+
+RUN mkdir -p /opt/android-sdk/cmdline-tools /opt/gradle-cache /opt/npm-cache /opt/android-home \
+    && curl -fsSLo /tmp/cmdline-tools.zip \
+        "https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_CMD_LINE_TOOLS}_latest.zip" \
+    && unzip -q /tmp/cmdline-tools.zip -d /tmp \
+    && mv /tmp/cmdline-tools /opt/android-sdk/cmdline-tools/latest \
+    && rm /tmp/cmdline-tools.zip \
+    && yes | sdkmanager --licenses > /dev/null \
+    && sdkmanager \
+        "platform-tools" \
+        "platforms;${ANDROID_PLATFORM}" \
+        "build-tools;${ANDROID_BUILD_TOOLS}" \
+        "ndk;${ANDROID_NDK}" \
+        "cmake;${ANDROID_CMAKE}"

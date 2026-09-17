@@ -8,6 +8,8 @@ node_modules/
 dist/
 web-build/
 expo-env.d.ts
+build/
+.cache/
 
 # Native
 .kotlin/
@@ -17,6 +19,8 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
+*.keystore
+keystore.properties
 
 # Metro
 .metro-health-check*
@@ -41,3 +45,4 @@ example
 # generated native folders
 /ios
 /android
+public/neaps-metric.tcd

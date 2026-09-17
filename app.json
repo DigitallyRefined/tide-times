@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "tide-times",
+    "name": "Tide Times",
     "slug": "tide-times",
-    "version": "1.0.0",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "tidetimes",
@@ -11,8 +11,10 @@
       "icon": "./assets/expo.icon"
     },
     "android": {
+      "package": "com.github.digitallyrefined.tidetimes",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#208AEF",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -21,16 +23,31 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "themeColor": "#208AEF"
     },
     "plugins": [
       "expo-router",
+      "./plugins/withAndroidBuildSetup",
+      "./plugins/withAndroidBackupRules",
       [
         "expo-splash-screen",
         {
           "backgroundColor": "#208AEF",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow tide-times to use your location to find nearby tide stations."
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": false
         }
       ]
     ],
